@@ -6,3 +6,4 @@ facturas_bp = Blueprint('facturas', __name__, url_prefix='/facturas')
 
 # Aquí puedes importar los módulos para registrar sus rutas con los Blueprints
 from .auth import *
+from .facturas import *

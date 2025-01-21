@@ -48,9 +48,17 @@ class User:
 
     # Actualizar nombre de usuario
     @staticmethod
-    def update_user(mysql, user_usernameN, user_username):
+    def update_user(mysql, nombre_usuario_nuevo, nombre_usuario):
         cursor = mysql.connection.cursor()
-        cursor.execute('UPDATE administradores SET nombre_usuario= %s WHERE nombre_usuario= %s', (user_usernameN, user_username))
+        cursor.execute('UPDATE administradores SET nombre_usuario= %s WHERE nombre_usuario= %s', (nombre_usuario_nuevo, nombre_usuario))
+        mysql.connection.commit()
+        cursor.close()
+        
+    @staticmethod
+    def changue_password(mysql, hashed_password, nombre_usuario):
+        cursor = mysql.connection.cursor()
+        cursor.execute("UPDATE administradores SET password=%s WHERE nombre_usuario=%s",(hashed_password, nombre_usuario)
+        )
         mysql.connection.commit()
         cursor.close()
 
