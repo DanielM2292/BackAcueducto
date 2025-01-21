@@ -1,15 +1,10 @@
-from flask import Flask, jsonify, request, render_template, redirect, url_for, session
+from flask import Flask, request, render_template, redirect, url_for, session
 from config import Config
+import hashlib, os
 from flask_cors import CORS
-from models import (
-    init_db, get_user_by_username, add_user, check_password, get_users, 
-    update_user, delete_user, get_all_products, get_product_by_id, 
-    add_product, update_product_by_id, delete_product_by_id, 
-    get_product_by_description, search_products_by_keyword, generate_custom_id,
-    add_cliente, update_cliente, delete_cliente, get_all_clientes, 
-    get_cliente_by_id, search_clientes_by_keyword
-)
+from models import init_db, get_user_by_username, add_user, check_password, get_users, update_user
 
+# Crear la conexion con la base de datos y llama a la inicializacion en el archivo models
 app = Flask(__name__)
 app.secret_key = "cualquier_clave"
 app.config.from_object(Config)
@@ -65,17 +60,19 @@ def login():
 def index():
     if not session.get("user"):
         return redirect(url_for('main'))
-    user_data = get_user_by_username(mysql, session["user"])
-    if user_data and check_password(user_data['password'], session["password"]):
-        if session["rol"] == "ROL001":
-            return render_template('admin.html')
-        elif session["rol"] == "ROL002":
-            return render_template('contador.html')
-        elif session["rol"] == "ROL003":
-            return render_template('auxiliar.html')
-    return redirect(url_for('main'))
 
-@app.route('/logout')
+    user = get_user_by_username(mysql, session["user"])
+    # user['password'] es la contraseña de la base de datos
+    if user and check_password(user['password'], session["password"]):
+        if user['id_rol'] == '1' and session["rol"] == "administrador":
+            return render_template('admin.html') 
+        elif user['id_rol'] == '2' and session["rol"] == "auxiliar" :
+            return render_template('auxiliar.html')
+        elif user['id_rol'] == '3' and session["rol"] == "contador":
+            return render_template('contador.html')
+    return redirect(url_for('main'))
+    
+@app.route('/logout')  
 def logout():
     session.clear()
     return redirect(url_for('main'))
